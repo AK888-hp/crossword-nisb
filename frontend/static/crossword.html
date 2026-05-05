@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CROSSCURRENT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --grid-bg: #000000;
+            --cell-bg: #111111;
+            --cell-text: #FFFFFF;
+            --cell-border: #333333;
+            --highlight-word: #222222;
+            --highlight-cell: #D4FF00;
+            --focus-text: #000000;
+            --correct-bg: #111111;
+            --correct-text: #D4FF00;
+            --accent-color: #D4FF00;
+            --text-color: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(-45deg, #000000, #081100, #142a00, #000000);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .left-pane {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .right-pane {
+            width: 350px;
+            background: #0a0a0a;
+            border-left: 2px solid #222;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            box-sizing: border-box;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.9);
+            z-index: 100;
+        }
+
+        /* Fullscreen specific styles */
+        :fullscreen .fullscreen-btn { display: none !important; }
+        :-webkit-full-screen .fullscreen-btn { display: none !important; }
+
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888888;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(212, 255, 0, 0.3);
+        }
+
+        .fullscreen-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: 'Orbitron', sans-serif;
+            padding: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .fullscreen-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .clue-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #333;
+            padding-top: 30px;
+        }
+
+        .clue-meta {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .clue-text-container {
+            font-size: 1.4em;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #ffffff;
+        }
+
+        .clue-placeholder {
+            color: #555;
+            font-style: italic;
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.2em;
+        }
+
+        .crossword-wrapper {
+            background: var(--grid-bg);
+            padding: 15px;
+            border: 2px solid var(--cell-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            transform-origin: center center;
+        }
+
+        table {
+            border-collapse: collapse;
+            background-color: var(--grid-bg);
+            animation: fadeInGrid 1s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        @keyframes fadeInGrid {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        td {
+            width: 45px; 
+            height: 45px;
+            padding: 0;
+            margin: 0;
+            border: 1px solid var(--cell-border);
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        td.cell-empty {
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        td.cell-active {
+            background-color: var(--cell-bg);
+            border: 2px solid #555555;
+        }
+
+        td.cell-highlighted {
+            background-color: var(--highlight-word);
+        }
+
+        td.cell-correct {
+            background-color: var(--correct-bg) !important;
+            border-top-color: var(--correct-border-top, var(--correct-border, var(--accent-color))) !important;
+            border-left-color: var(--correct-border-left, var(--correct-border, var(--accent-color))) !important;
+            border-bottom-color: var(--correct-border-bottom, var(--correct-border, var(--accent-color))) !important;
+            border-right-color: var(--correct-border-right, var(--correct-border, var(--accent-color))) !important;
+            animation: correctPulse 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
+            z-index: 5;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); background-color: #ffffff; }
+            50% { transform: scale(1.15); background-color: var(--accent-color); box-shadow: 0 0 30px var(--accent-color); z-index: 50; }
+            100% { transform: scale(1); }
+        }
+
+        input {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 24px; 
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: none;
+            background: transparent;
+            outline: none;
+            color: var(--cell-text);
+            cursor: pointer;
+            caret-color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            background-color: var(--highlight-cell);
+            color: var(--focus-text);
+            transform: scale(1.15);
+            box-shadow: 0 0 20px var(--accent-color);
+            z-index: 10;
+        }
+
+        td.cell-correct input {
+            color: var(--correct-text, var(--accent-color)) !important;
+            text-shadow: var(--correct-shadow, 0 0 10px var(--correct-text, var(--accent-color))) !important;
+            font-weight: 700;
+        }
+
+        .number {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #888888;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .victory-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+        }
+        
+        .victory-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4em;
+            color: var(--accent-color);
+            text-shadow: 0 0 30px rgba(212, 255, 0, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-align: center;
+            animation: pulse 1s infinite;
+        }
+        
+        .loading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; text-shadow: 0 0 0 rgba(212, 255, 0, 0); transform: scale(1); }
+            50% { opacity: 1; text-shadow: 0 0 20px rgba(212, 255, 0, 0.8); transform: scale(1.05); }
+            100% { opacity: 0.3; text-shadow: 0 0 0 rgba(212, 255, 0, 0); transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="left-pane">
+        <div class="crossword-wrapper" id="grid-container">
+            <div class="loading">Loading Grid...</div>
+        </div>
+    </div>
+    
+    <div class="right-pane">
+        <div class="dashboard-stats">
+            <div class="stat-box">
+                <span class="stat-label">Time</span>
+                <span class="stat-value"><span id="timer">0</span>s</span>
+            </div>
+        </div>
+        
+        <button class="fullscreen-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+        
+        <div class="clue-panel">
+            <span class="clue-meta" id="clue-meta-text"></span>
+            <div class="clue-text-container" id="clue-text-container">
+                <div class="clue-placeholder">Select a box to reveal the clue.</div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="victory-overlay" id="victory-overlay">
+    <div class="victory-text">CROSSWORD SOLVED!</div>
+    <div class="stat-value" id="final-stats"></div>
+</div>
+
+<script>
+    var current_username = '';
+    var api_url = '';
+    
+    let gridData = {};
+    let currentWordInfo = null;
+    let timeSeconds = 0;
+    let timerInterval;
+    let wordsCompleted = new Set();
+    let cellMap = {}; 
+
+    const cyberPalette = [
+        '#D4FF00', // Neon Yellow
+        '#00F0FF', // Cyan
+        '#FF003C', // Magenta
+        '#FF5E00', // Neon Orange
+        '#B000FF', // Purple
+        '#00FFCC'  // Mint/Teal
+    ];
+
+    async function fetchGrid() {
+        try {
+            const response = await fetch(`${api_url}/grid`);
+            const data = await response.json();
+            gridData = data;
+            document.getElementById('grid-container').innerHTML = ''; 
+            renderGrid();
+            startTimer();
+        } catch (e) {
+            console.error("Error fetching grid:", e);
+            document.getElementById('grid-container').innerHTML = "<div class='loading' style='color:#ff3333;'>Error loading grid.</div>";
+        }
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeSeconds++;
+            document.getElementById('timer').innerText = timeSeconds;
+        }, 1000);
+    }
+
+    function renderGrid() {
+        const container = document.getElementById('grid-container');
+        const table = document.createElement('table');
+        
+        const width = gridData.dimensions.width;
+        const height = gridData.dimensions.height;
+        
+        gridData.words.forEach((word, index) => {
+            word.index = index;
+            const num = index + 1;
+            let isStart = true;
+            
+            for(let i=0; i<word.length; i++) {
+                const cx = word.direction === 'across' ? word.x + i : word.x;
+                const cy = word.direction === 'down' ? word.y + i : word.y;
+                const key = `${cx}-${cy}`;
+                
+                if(!cellMap[key]) cellMap[key] = { words: [], number: null };
+                cellMap[key].words.push(word);
+                if(isStart && !cellMap[key].number) {
+                    cellMap[key].number = num;
+                }
+                isStart = false;
+            }
+        });
+        
+        // Assign colors ensuring no intersections share a color
+        gridData.words.forEach((word) => {
+            let usedColors = new Set();
+            for(let i=0; i<word.length; i++) {
+                const cx = word.direction === 'across' ? word.x + i : word.x;
+                const cy = word.direction === 'down' ? word.y + i : word.y;
+                const key = `${cx}-${cy}`;
+                cellMap[key].words.forEach(w => {
+                    if (w.id !== word.id && w.color) {
+                        usedColors.add(w.color);
+                    }
+                });
+            }
+            
+            let preferredStartIndex = word.index % cyberPalette.length;
+            let chosenColor = null;
+            for(let i=0; i<cyberPalette.length; i++) {
+                let colorToTry = cyberPalette[(preferredStartIndex + i) % cyberPalette.length];
+                if(!usedColors.has(colorToTry)) {
+                    chosenColor = colorToTry;
+                    break;
+                }
+            }
+            word.color = chosenColor || cyberPalette[0];
+            
+            // Manual overrides for confusing adjacencies
+            if (word.index + 1 === 8) {
+                word.color = '#FF5E00'; // Neon Orange
+            }
+            if (word.index + 1 === 20) {
+                word.color = '#00F0FF'; // Cyan
+            }
+        });
+
+        for(let y=0; y<height; y++) {
+            const tr = document.createElement('tr');
+            for(let x=0; x<width; x++) {
+                const td = document.createElement('td');
+                const key = `${x}-${y}`;
+                
+                if(cellMap[key]) {
+                    td.className = 'cell-active';
+                    td.id = `td-${x}-${y}`;
+                    
+                    const intersectingWords = cellMap[key].words;
+                    if (intersectingWords.length > 1) {
+                        const acrossW = intersectingWords.find(w => w.direction === 'across');
+                        const downW = intersectingWords.find(w => w.direction === 'down');
+                        if (acrossW && downW) {
+                            td.style.borderTopColor = acrossW.color;
+                            td.style.borderBottomColor = acrossW.color;
+                            td.style.borderLeftColor = downW.color;
+                            td.style.borderRightColor = downW.color;
+                        } else {
+                            td.style.borderColor = intersectingWords[0].color;
+                        }
+                    } else {
+                        td.style.borderColor = intersectingWords[0].color;
+                    }
+                    
+                    if(cellMap[key].number) {
+                        const numDiv = document.createElement('div');
+                        numDiv.className = 'number';
+                        numDiv.innerText = cellMap[key].number;
+                        td.appendChild(numDiv);
+                    }
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.id = `input-${x}-${y}`;
+                    
+                    input.addEventListener('focus', () => handleCellFocus(x, y, cellMap[key].words));
+                    input.addEventListener('input', (e) => handleCellInput(e, x, y));
+                    input.addEventListener('keydown', (e) => {
+                        if (/^[a-zA-Z]$/.test(e.key)) {
+                            e.target.value = '';
+                        }
+                        handleCellKeydown(e, x, y, cellMap[key].words);
+                    });
+                    
+                    td.appendChild(input);
+                } else {
+                    td.className = 'cell-empty';
+                }
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+        container.appendChild(table);
+    }
+
+    function handleCellFocus(x, y, words, explicitWord = null) {
+        document.querySelectorAll('td').forEach(td => td.classList.remove('cell-highlighted'));
+        
+        if(words.length === 0) return;
+        
+        let selectedWord;
+        if (explicitWord) {
+            selectedWord = explicitWord;
+        } else {
+            const uncompletedWords = words.filter(w => !wordsCompleted.has(w.id));
+            if (uncompletedWords.length > 0) {
+                if (currentWordInfo && uncompletedWords.find(w => w.id === currentWordInfo.id)) {
+                    selectedWord = uncompletedWords.find(w => w.id === currentWordInfo.id);
+                } else {
+                    selectedWord = uncompletedWords[0];
+                }
+            } else {
+                if (currentWordInfo && words.find(w => w.id === currentWordInfo.id)) {
+                    selectedWord = words.find(w => w.id === currentWordInfo.id);
+                } else {
+                    selectedWord = words[0];
+                }
+            }
+        }
+        
+        currentWordInfo = selectedWord;
+        document.documentElement.style.setProperty('--accent-color', selectedWord.color);
+        document.documentElement.style.setProperty('--highlight-cell', selectedWord.color);
+        
+        highlightWord(selectedWord);
+        updateSidePanelClue(selectedWord);
+    }
+    
+    function updateSidePanelClue(word) {
+        document.getElementById('clue-meta-text').innerText = `${word.direction} • ${word.length} letters`;
+        
+        let contentHtml = `<div>${word.clue}</div>`;
+        if (word.image) {
+            contentHtml += `<img src="${word.image}" style="max-width:100%; max-height: 250px; margin-top: 20px; border: 1px solid #333; border-radius: 4px;">`;
+        }
+        document.getElementById('clue-text-container').innerHTML = contentHtml;
+    }
+    
+    function highlightWord(word) {
+        for(let i=0; i<word.length; i++) {
+            const cx = word.direction === 'across' ? word.x + i : word.x;
+            const cy = word.direction === 'down' ? word.y + i : word.y;
+            const td = document.getElementById(`td-${cx}-${cy}`);
+            if(td && !td.classList.contains('cell-correct')) {
+                td.classList.add('cell-highlighted');
+            }
+        }
+    }
+
+    function handleCellInput(e, x, y) {
+        const val = e.target.value;
+        if(val && currentWordInfo) {
+            const wordToValidate = currentWordInfo; 
+            let nx = x;
+            let ny = y;
+            if(currentWordInfo.direction === 'across') nx++;
+            else ny++;
+            
+            const endX = currentWordInfo.direction === 'across' ? currentWordInfo.x + currentWordInfo.length - 1 : currentWordInfo.x;
+            const endY = currentWordInfo.direction === 'down' ? currentWordInfo.y + currentWordInfo.length - 1 : currentWordInfo.y;
+            
+            if ((currentWordInfo.direction === 'across' && nx <= endX) || 
+                (currentWordInfo.direction === 'down' && ny <= endY)) {
+                const nextInput = document.getElementById(`input-${nx}-${ny}`);
+                if(nextInput && !nextInput.disabled) {
+                    nextInput.focus();
+                }
+            }
+            
+            autoValidate(wordToValidate); 
+        }
+    }
+
+    function handleCellKeydown(e, x, y, words) {
+        if(e.key === 'Backspace' && !e.target.value) {
+            let nx = x;
+            let ny = y;
+            if(currentWordInfo && currentWordInfo.direction === 'across') nx--;
+            else if(currentWordInfo && currentWordInfo.direction === 'down') ny--;
+            
+            const prevInput = document.getElementById(`input-${nx}-${ny}`);
+            if(prevInput && !prevInput.disabled) {
+                prevInput.focus();
+            }
+        }
+        if(e.key === ' ' && words.length > 1) {
+            e.preventDefault();
+            let nextWord = currentWordInfo.id === words[0].id ? words[1] : words[0];
+            handleCellFocus(x, y, words, nextWord); 
+        }
+    }
+    
+    async function autoValidate(wordInfo) {
+        if(!wordInfo) return;
+        if(wordsCompleted.has(wordInfo.id)) return;
+        
+        let guessedWord = "";
+        for(let i=0; i<wordInfo.length; i++) {
+            const cx = wordInfo.direction === 'across' ? wordInfo.x + i : wordInfo.x;
+            const cy = wordInfo.direction === 'down' ? wordInfo.y + i : wordInfo.y;
+            const input = document.getElementById(`input-${cx}-${cy}`);
+            guessedWord += input ? input.value : "";
+        }
+        
+        if(guessedWord.length !== wordInfo.length) {
+            return; 
+        }
+
+        try {
+            const response = await fetch(`${api_url}/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    x: wordInfo.x,
+                    y: wordInfo.y,
+                    direction: wordInfo.direction,
+                    word: guessedWord
+                })
+            });
+            
+            const data = await response.json();
+            if(data.correct) {
+                wordsCompleted.add(wordInfo.id);
+                
+                for(let i=0; i<wordInfo.length; i++) {
+                    const cx = wordInfo.direction === 'across' ? wordInfo.x + i : wordInfo.x;
+                    const cy = wordInfo.direction === 'down' ? wordInfo.y + i : wordInfo.y;
+                    const td = document.getElementById(`td-${cx}-${cy}`);
+                    const input = document.getElementById(`input-${cx}-${cy}`);
+                    td.classList.remove('cell-highlighted');
+                    td.classList.add('cell-correct');
+                    
+                    const intersectingWords = cellMap[`${cx}-${cy}`].words;
+                    const completedIntersectingWords = intersectingWords.filter(w => wordsCompleted.has(w.id));
+                    
+                    if (completedIntersectingWords.length > 1) {
+                        const acrossW = completedIntersectingWords.find(w => w.direction === 'across');
+                        const downW = completedIntersectingWords.find(w => w.direction === 'down');
+                        
+                        if (acrossW && downW) {
+                            td.style.setProperty('--correct-border-top', acrossW.color);
+                            td.style.setProperty('--correct-border-bottom', acrossW.color);
+                            td.style.setProperty('--correct-border-left', downW.color);
+                            td.style.setProperty('--correct-border-right', downW.color);
+                            input.style.setProperty('--correct-text', '#FFFFFF');
+                            input.style.setProperty('--correct-shadow', `-3px -3px 10px ${acrossW.color}, 3px 3px 10px ${downW.color}, 0 0 5px #ffffff`);
+                        } else {
+                            const c1 = completedIntersectingWords[0].color;
+                            const c2 = completedIntersectingWords[1].color;
+                            
+                            td.style.setProperty('--correct-border-top', c1);
+                            td.style.setProperty('--correct-border-left', c1);
+                            td.style.setProperty('--correct-border-bottom', c2);
+                            td.style.setProperty('--correct-border-right', c2);
+                            
+                            input.style.setProperty('--correct-text', '#FFFFFF');
+                            input.style.setProperty('--correct-shadow', `-3px -3px 10px ${c1}, 3px 3px 10px ${c2}, 0 0 5px #ffffff`);
+                        }
+                    } else {
+                        td.style.setProperty('--correct-border', wordInfo.color);
+                        td.style.setProperty('--correct-text', wordInfo.color);
+                    }
+                    
+                    const allCompleted = intersectingWords.every(w => wordsCompleted.has(w.id));
+                    if(allCompleted) {
+                        input.disabled = true;
+                    }
+                }
+                
+                if(currentWordInfo && wordInfo.id === currentWordInfo.id) {
+                    document.getElementById('clue-meta-text').innerHTML = `<span style="color:#D4FF00; text-shadow: 0 0 10px #D4FF00;">SYSTEM OVERRIDE SUCCESS</span>`;
+                    setTimeout(() => {
+                       document.getElementById('clue-meta-text').innerText = `${wordInfo.direction} • ${wordInfo.length} letters`;
+                    }, 1500);
+                }
+                
+                if(wordsCompleted.size === gridData.words.length) {
+                    triggerVictory();
+                }
+            }
+        } catch(e) {
+            console.error("Error auto-validating:", e);
+        }
+    }
+
+    async function triggerVictory() {
+        clearInterval(timerInterval);
+        document.getElementById('victory-overlay').style.display = 'flex';
+        document.getElementById('final-stats').innerText = `Time: ${timeSeconds}s`;
+        
+        try {
+            await fetch(`${api_url}/score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: current_username,
+                    score: timeSeconds,
+                    time_seconds: timeSeconds
+                })
+            });
+            
+            setTimeout(() => {
+                window.parent.location.reload();
+            }, 4000);
+        } catch(e) {
+             console.error("Error saving score:", e);
+        }
+    }
+
+    if(current_username && api_url) {
+        fetchGrid();
+    } else {
+        document.getElementById('grid-container').innerHTML = "<div class='loading' style='color:#ff3333;'>Missing configuration variables.</div>";
+    }
+</script>
+</body>
+</html>

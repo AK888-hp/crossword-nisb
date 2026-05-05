@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: crossword-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && python seed.py && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crossword-db
+          property: connectionString
+
+  - type: pgo
+    name: crossword-db
+    plan: free

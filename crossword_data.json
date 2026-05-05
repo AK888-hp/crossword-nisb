@@ -1,0 +1,28 @@
+{
+  "grid": {
+    "width": 17,
+    "height": 15
+  },
+  "words": [
+    {"word": "inductor", "clue": "Passive two-terminal electrical component that stores energy in a magnetic field", "length": 8, "x": 0, "y": 0, "direction": "across"},
+    {"word": "resistor", "clue": "Passive two-terminal electrical component that implements electrical resistance", "length": 8, "x": 9, "y": 0, "direction": "across"},
+    {"word": "power", "clue": "Rate of doing work", "length": 5, "x": 0, "y": 2, "direction": "across"},
+    {"word": "attenuation", "clue": "Gradual loss of flux intensity through a medium", "length": 11, "x": 6, "y": 3, "direction": "across"},
+    {"word": "cmos", "clue": "Complementary metal-oxide-semiconductor", "length": 4, "x": 0, "y": 7, "direction": "across"},
+    {"word": "oscillation", "clue": "Repetitive variation, typically in time", "length": 11, "x": 1, "y": 10, "direction": "across"},
+    {"word": "bandwidth", "clue": "Range of frequencies within a given band", "length": 9, "x": 1, "y": 12, "direction": "across"},
+    {"word": "semiconductor", "clue": "Material with conductivity between an insulator and most metals", "length": 13, "x": 0, "y": 14, "direction": "across"},
+    {"word": "amplitude", "clue": "Maximum extent of a vibration or oscillation", "length": 9, "x": 8, "y": 13, "direction": "across"},
+    {"word": "motor", "clue": "Machine that supplies motive power", "length": 5, "x": 12, "y": 11, "direction": "across"},
+    {"word": "impedence", "clue": "The effective resistance of an electric circuit to alternating current", "length": 9, "x": 0, "y": 0, "direction": "down"},
+    {"word": "circuit", "clue": "A complete and closed path for an electric current", "length": 7, "x": 4, "y": 0, "direction": "down"},
+    {"word": "rectifier", "clue": "Device which converts alternating current into direct current", "length": 9, "x": 7, "y": 0, "direction": "down"},
+    {"word": "saturation", "clue": "Operating region of a transistor when fully turned on", "length": 10, "x": 11, "y": 0, "direction": "down"},
+    {"word": "voltage", "clue": "Electric potential difference", "length": 7, "x": 15, "y": 2, "direction": "down"},
+    {"word": "analog", "clue": "Relating to a continuous physical variable", "length": 6, "x": 16, "y": 2, "direction": "down"},
+    {"word": "aliasing", "clue": "Effect causing different signals to become indistinguishable when sampled", "length": 8, "x": 12, "y": 3, "direction": "down"},
+    {"word": "transistor", "clue": "Semiconductor device used to amplify or switch signals", "length": 10, "x": 13, "y": 3, "direction": "down"},
+    {"word": "diode", "clue": "Device typically allowing current flow in one direction only", "length": 5, "x": 4, "y": 9, "direction": "down"},
+    {"word": "ohm", "clue": "The SI unit of electrical resistance", "length": 3, "x": 9, "y": 11, "direction": "down"}
+  ]
+}

@@ -9,6 +9,13 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
     
+    /* Hide Streamlit UI Chrome (Share/Deploy/Header/Footer) */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header {visibility: hidden !important;}
+    [data-testid="stHeader"] {display: none !important;}
+    [data-testid="stToolbar"] {display: none !important;}
+    
     /* Global Font Overrides */
     html, body, [class*="css"], .stApp, p, span, div, label, input, button {
         font-family: 'Rajdhani', sans-serif !important;

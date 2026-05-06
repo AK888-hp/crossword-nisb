@@ -121,7 +121,10 @@
                 margin-bottom: 8px;
             }
             .fullscreen-btn {
-                display: none;
+                display: block;
+                padding: 8px;
+                margin-top: 5px;
+                font-size: 0.8em;
             }
             .clue-panel {
                 padding-top: 5px;
@@ -168,36 +171,29 @@
         }
 
         /* ===== FULLSCREEN MODE STYLES ===== */
-        :fullscreen body,
-        :-webkit-full-screen body,
-        :-moz-full-screen body {
-            overflow: auto;
+        :fullscreen body, :-webkit-full-screen body {
+            overflow: hidden;
             height: 100vh;
         }
-        :fullscreen .app-container,
-        :-webkit-full-screen .app-container,
-        :-moz-full-screen .app-container {
-            flex-direction: column;
+        :fullscreen .app-container, :-webkit-full-screen .app-container {
+            flex-direction: column-reverse; /* Clues Top, Grid Bottom */
             height: 100vh;
+            width: 100vw;
         }
-        :fullscreen .left-pane,
-        :-webkit-full-screen .left-pane,
-        :-moz-full-screen .left-pane {
+        :fullscreen .right-pane, :-webkit-full-screen .right-pane {
+            display: flex !important;
             width: 100%;
-            height: 100vh;
+            height: 30vh;
+            border-left: none;
+            border-bottom: 2px solid #333;
+        }
+        :fullscreen .left-pane, :-webkit-full-screen .left-pane {
+            width: 100%;
+            height: 70vh;
+            flex: 1;
             overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            justify-content: flex-start;
-            align-items: flex-start;
         }
-        :fullscreen .right-pane,
-        :-webkit-full-screen .right-pane,
-        :-moz-full-screen .right-pane {
-            display: none !important;
-        }
-        :fullscreen .fullscreen-btn,
-        :-webkit-full-screen .fullscreen-btn,
-        :-moz-full-screen .fullscreen-btn {
+        :fullscreen .fullscreen-btn, :-webkit-full-screen .fullscreen-btn {
             display: none !important;
         }
 

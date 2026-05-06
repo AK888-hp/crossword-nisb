@@ -82,6 +82,28 @@ st.markdown("""
     .stTabs [aria-selected="true"] {
         color: #D4FF00 !important;
         border-bottom-color: #D4FF00 !important;
+    /* Logo Responsive Styles */
+    .logo-left {
+        position: fixed; top: 20px; left: 25px; z-index: 999999;
+    }
+    .logo-left img { height: 80px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3)); }
+    .logo-center {
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999999;
+    }
+    .logo-center img { height: 150px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3)); }
+    .logo-right {
+        position: fixed; top: 20px; right: 25px; z-index: 999999;
+    }
+    .logo-right img { height: 80px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3)); }
+
+    @media (max-width: 768px) {
+        .logo-left img  { height: 40px; }
+        .logo-center img { height: 75px; }
+        .logo-right img { height: 40px; }
+        .logo-left  { top: 8px; left: 10px; }
+        .logo-center { top: 8px; }
+        .logo-right { top: 8px; right: 10px; }
+    }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -98,14 +120,14 @@ init_session()
 
 def render_logos():
     st.markdown(f"""
-    <div style="position: fixed; top: 20px; left: 25px; z-index: 999999;">
-        <img src="{API_URL}/static/images/cas.png" style="height: 80px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3));">
+    <div class="logo-left">
+        <img src="{API_URL}/static/images/cas.png">
     </div>
-    <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999999;">
-        <img src="{API_URL}/static/images/illume.png" style="height: 150px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3));">
+    <div class="logo-center">
+        <img src="{API_URL}/static/images/illume.png">
     </div>
-    <div style="position: fixed; top: 20px; right: 25px; z-index: 999999;">
-        <img src="{API_URL}/static/images/tree.png" style="height: 80px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3));">
+    <div class="logo-right">
+        <img src="{API_URL}/static/images/tree.png">
     </div>
     """, unsafe_allow_html=True)
 

@@ -168,9 +168,39 @@
             cursor: pointer;
         }
 
-        /* Fullscreen specific styles */
-        :fullscreen .fullscreen-btn { display: none !important; }
-        :-webkit-full-screen .fullscreen-btn { display: none !important; }
+        /* ===== FULLSCREEN MODE STYLES ===== */
+        :fullscreen body,
+        :-webkit-full-screen body,
+        :-moz-full-screen body {
+            overflow: auto;
+            height: 100vh;
+        }
+        :fullscreen .app-container,
+        :-webkit-full-screen .app-container,
+        :-moz-full-screen .app-container {
+            flex-direction: column;
+            height: 100vh;
+        }
+        :fullscreen .left-pane,
+        :-webkit-full-screen .left-pane,
+        :-moz-full-screen .left-pane {
+            width: 100%;
+            height: 100vh;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        :fullscreen .right-pane,
+        :-webkit-full-screen .right-pane,
+        :-moz-full-screen .right-pane {
+            display: none !important;
+        }
+        :fullscreen .fullscreen-btn,
+        :-webkit-full-screen .fullscreen-btn,
+        :-moz-full-screen .fullscreen-btn {
+            display: none !important;
+        }
 
         .dashboard-stats {
             display: flex;
@@ -833,35 +863,25 @@
     }
 
     function toggleFullScreen() {
-        const rightPane = document.querySelector('.right-pane');
-        const leftPane = document.querySelector('.left-pane');
-        const appContainer = document.querySelector('.app-container');
-        const btn = document.getElementById('fs-btn');
-        const isFullscreen = rightPane.classList.contains('fs-hidden');
-
-        if (!isFullscreen) {
-            // Enter fullscreen: hide clue panel, give grid full space
-            rightPane.classList.add('fs-hidden');
-            leftPane.style.width = '100%';
-            leftPane.style.height = '100vh';
-            leftPane.style.justifyContent = 'flex-start';
-            leftPane.style.alignItems = 'flex-start';
-            appContainer.style.flexDirection = 'row';
-            btn.innerText = '✕ Exit Fullscreen';
+        const el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (el.requestFullscreen) {
+                el.requestFullscreen().catch(err => {
+                    console.warn('Fullscreen failed:', err);
+                });
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            } else if (el.mozRequestFullScreen) {
+                el.mozRequestFullScreen();
+            }
         } else {
-            // Exit fullscreen: restore layout
-            rightPane.classList.remove('fs-hidden');
-            leftPane.style.width = '';
-            leftPane.style.height = '';
-            leftPane.style.justifyContent = '';
-            leftPane.style.alignItems = '';
-            appContainer.style.flexDirection = '';
-            btn.innerText = '⛶ Fullscreen';
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
         }
     }
 
     function closeMobileFs() {
-        // Alias kept for safety
         toggleFullScreen();
     }
 </script>

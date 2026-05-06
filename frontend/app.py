@@ -201,7 +201,15 @@ def game_page():
     html_content = html_content.replace("var current_username = '';", f"var current_username = '{st.session_state.user}';")
     html_content = html_content.replace("var api_url = '';", f"var api_url = '{API_URL}';")
     
-    components.html(html_content, height=1200, scrolling=False)
+    # Use srcdoc iframe with allowfullscreen so the fullscreen button works on mobile
+    import base64
+    encoded = base64.b64encode(html_content.encode('utf-8')).decode('utf-8')
+    st.markdown(
+        f'<iframe src="data:text/html;base64,{encoded}" width="100%" height="1000" '
+        f'allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" '
+        f'frameborder="0" style="border:none;"></iframe>',
+        unsafe_allow_html=True
+    )
 
 def admin_page():
     render_logos()

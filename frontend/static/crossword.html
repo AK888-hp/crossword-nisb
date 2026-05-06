@@ -119,7 +119,10 @@
                 margin-bottom: 8px;
             }
             .fullscreen-btn {
-                display: none;
+                display: block;
+                margin-bottom: 8px;
+                padding: 6px;
+                font-size: 0.65em;
             }
             .clue-panel {
                 padding-top: 8px;
@@ -133,6 +136,36 @@
                 font-size: 1em;
                 line-height: 1.3;
             }
+        }
+
+        /* Mobile fullscreen grid overlay */
+        .mobile-fs-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            z-index: 9999;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .mobile-fs-overlay.active {
+            display: block;
+        }
+        .mobile-fs-close {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+            background: transparent;
+            border: 1px solid #D4FF00;
+            color: #D4FF00;
+            font-family: 'Orbitron', sans-serif;
+            padding: 6px 12px;
+            font-size: 0.7em;
+            letter-spacing: 2px;
+            cursor: pointer;
         }
 
         /* Fullscreen specific styles */
@@ -395,6 +428,12 @@
 <div class="victory-overlay" id="victory-overlay">
     <div class="victory-text">CROSSWORD SOLVED!</div>
     <div class="stat-value" id="final-stats"></div>
+</div>
+
+<!-- Mobile fullscreen grid overlay -->
+<div class="mobile-fs-overlay" id="mobile-fs-overlay">
+    <button class="mobile-fs-close" onclick="closeMobileFs()">✕ CLOSE</button>
+    <div id="mobile-fs-grid"></div>
 </div>
 
 <script>
@@ -786,6 +825,41 @@
         fetchGrid();
     } else {
         document.getElementById('grid-container').innerHTML = "<div class='loading' style='color:#ff3333;'>Missing configuration variables.</div>";
+    }
+
+    function toggleFullScreen() {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            // Move the REAL interactive grid into the fullscreen overlay
+            const overlay = document.getElementById('mobile-fs-overlay');
+            const mfsGrid = document.getElementById('mobile-fs-grid');
+            const gridContainer = document.getElementById('grid-container');
+            const originalParent = document.querySelector('.left-pane');
+            mfsGrid.appendChild(gridContainer);
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            overlay.dataset.originalParent = 'left-pane';
+        } else {
+            // On desktop: use native Fullscreen API
+            const el = document.documentElement;
+            if (!document.fullscreenElement) {
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    function closeMobileFs() {
+        const overlay = document.getElementById('mobile-fs-overlay');
+        const gridContainer = document.getElementById('grid-container');
+        const leftPane = document.querySelector('.left-pane');
+        // Move the real grid back to its original spot
+        leftPane.appendChild(gridContainer);
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
     }
 </script>
 </body>

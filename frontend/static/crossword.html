@@ -138,6 +138,46 @@
             }
         }
 
+        /* ===== MOBILE FLOATING CLUE BAR (stays visible above keyboard) ===== */
+        .mobile-clue-bar {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .mobile-clue-bar {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 8888;
+                background: rgba(10, 10, 10, 0.97);
+                border-bottom: 2px solid var(--accent-color);
+                padding: 8px 12px;
+                box-shadow: 0 4px 20px rgba(212, 255, 0, 0.15);
+                transform: translateY(-100%);
+                transition: transform 0.25s ease;
+                box-sizing: border-box;
+            }
+            .mobile-clue-bar.visible {
+                transform: translateY(0);
+            }
+            .mobile-clue-bar .mcb-meta {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 0.6em;
+                letter-spacing: 2px;
+                color: var(--accent-color);
+                text-transform: uppercase;
+                margin-bottom: 3px;
+            }
+            .mobile-clue-bar .mcb-text {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.95em;
+                font-weight: 600;
+                color: #fff;
+                line-height: 1.3;
+            }
+        }
+
         /* Mobile fullscreen grid overlay */
         .mobile-fs-overlay {
             display: none;
@@ -465,6 +505,12 @@
     <div class="stat-value" id="final-stats"></div>
 </div>
 
+<!-- Mobile floating clue bar (always visible above keyboard) -->
+<div class="mobile-clue-bar" id="mobile-clue-bar">
+    <div class="mcb-meta" id="mcb-meta"></div>
+    <div class="mcb-text" id="mcb-text"></div>
+</div>
+
 <!-- Mobile fullscreen grid overlay -->
 <div class="mobile-fs-overlay" id="mobile-fs-overlay">
     <button class="mobile-fs-close" onclick="closeMobileFs()">✕ CLOSE</button>
@@ -676,13 +722,21 @@
     }
     
     function updateSidePanelClue(word) {
-        document.getElementById('clue-meta-text').innerText = `${word.direction} • ${word.length} letters`;
+        const metaText = `${word.direction} • ${word.length} letters`;
+        document.getElementById('clue-meta-text').innerText = metaText;
         
         let contentHtml = `<div>${word.clue}</div>`;
         if (word.image) {
             contentHtml += `<img src="${word.image}" style="max-width:100%; max-height: 250px; margin-top: 20px; border: 1px solid #333; border-radius: 4px;">`;
         }
         document.getElementById('clue-text-container').innerHTML = contentHtml;
+
+        // Update mobile floating clue bar
+        if (window.innerWidth <= 768) {
+            document.getElementById('mcb-meta').innerText = metaText;
+            document.getElementById('mcb-text').innerText = word.clue;
+            document.getElementById('mobile-clue-bar').classList.add('visible');
+        }
     }
     
     function highlightWord(word) {

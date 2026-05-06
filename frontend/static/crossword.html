@@ -66,6 +66,56 @@
             z-index: 100;
         }
 
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+            }
+            .left-pane {
+                width: 100%;
+                flex: none;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 10px 5px;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+                align-items: flex-start;
+            }
+            .right-pane {
+                width: 100%;
+                border-left: none;
+                border-top: 2px solid #222;
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
+                padding: 15px;
+                min-height: 250px;
+            }
+            td {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            input {
+                font-size: 16px !important;
+            }
+            .number {
+                font-size: 8px !important;
+            }
+            .stat-value {
+                font-size: 1.3em;
+            }
+            .fullscreen-btn {
+                display: none;
+            }
+            .clue-text-container {
+                font-size: 1.1em;
+            }
+        }
+
         /* Fullscreen specific styles */
         :fullscreen .fullscreen-btn { display: none !important; }
         :-webkit-full-screen .fullscreen-btn { display: none !important; }

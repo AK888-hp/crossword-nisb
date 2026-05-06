@@ -79,11 +79,11 @@
             }
             .right-pane {
                 width: 100%;
-                height: 30vh; /* Fixed height for clues at top */
+                height: 35vh; /* Slightly more height for clues */
                 border-left: none;
                 border-bottom: 2px solid #333;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-                padding: 30px 15px 10px 15px; /* Increased top padding to avoid keyboard bars */
+                padding: 45px 15px 10px 15px; /* Added 45px top padding to clear browser bars */
                 overflow-y: auto;
                 box-sizing: border-box;
                 flex-shrink: 0;
@@ -616,9 +616,9 @@
                     input.type = 'text';
                     input.maxLength = 1;
                     input.id = `input-${x}-${y}`;
-                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocomplete', 'one-time-code'); // Tricks most browsers to hide password managers
                     input.setAttribute('autocorrect', 'off');
-                    input.setAttribute('autocapitalize', 'off');
+                    input.setAttribute('autocapitalize', 'none');
                     input.setAttribute('spellcheck', 'false');
                     
                     input.addEventListener('focus', () => handleCellFocus(x, y, cellMap[key].words));

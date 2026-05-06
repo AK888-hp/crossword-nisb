@@ -82,6 +82,8 @@ st.markdown("""
     .stTabs [aria-selected="true"] {
         color: #D4FF00 !important;
         border-bottom-color: #D4FF00 !important;
+    }
+
     /* Logo Responsive Styles */
     .logo-left {
         position: fixed; top: 20px; left: 25px; z-index: 999999;
@@ -97,13 +99,12 @@ st.markdown("""
     .logo-right img { height: 80px; filter: drop-shadow(0 0 15px rgba(212,255,0,0.3)); }
 
     @media (max-width: 768px) {
-        .logo-left img  { height: 40px; }
-        .logo-center img { height: 75px; }
-        .logo-right img { height: 40px; }
         .logo-left  { top: 8px; left: 10px; }
+        .logo-left img  { height: 40px; }
         .logo-center { top: 8px; }
+        .logo-center img { height: 75px; }
         .logo-right { top: 8px; right: 10px; }
-    }
+        .logo-right img { height: 40px; }
     }
 </style>
 """, unsafe_allow_html=True)

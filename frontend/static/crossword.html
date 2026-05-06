@@ -221,6 +221,11 @@
             box-shadow: 0 0 15px var(--accent-color);
         }
 
+        /* Fullscreen mode: hide right panel */
+        .right-pane.fs-hidden {
+            display: none !important;
+        }
+
         .clue-panel {
             flex: 1;
             display: flex;
@@ -414,7 +419,7 @@
             </div>
         </div>
         
-        <button class="fullscreen-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+        <button class="fullscreen-btn" id="fs-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
         
         <div class="clue-panel">
             <span class="clue-meta" id="clue-meta-text"></span>
@@ -828,38 +833,36 @@
     }
 
     function toggleFullScreen() {
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-            // Move the REAL interactive grid into the fullscreen overlay
-            const overlay = document.getElementById('mobile-fs-overlay');
-            const mfsGrid = document.getElementById('mobile-fs-grid');
-            const gridContainer = document.getElementById('grid-container');
-            const originalParent = document.querySelector('.left-pane');
-            mfsGrid.appendChild(gridContainer);
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            overlay.dataset.originalParent = 'left-pane';
+        const rightPane = document.querySelector('.right-pane');
+        const leftPane = document.querySelector('.left-pane');
+        const appContainer = document.querySelector('.app-container');
+        const btn = document.getElementById('fs-btn');
+        const isFullscreen = rightPane.classList.contains('fs-hidden');
+
+        if (!isFullscreen) {
+            // Enter fullscreen: hide clue panel, give grid full space
+            rightPane.classList.add('fs-hidden');
+            leftPane.style.width = '100%';
+            leftPane.style.height = '100vh';
+            leftPane.style.justifyContent = 'flex-start';
+            leftPane.style.alignItems = 'flex-start';
+            appContainer.style.flexDirection = 'row';
+            btn.innerText = '✕ Exit Fullscreen';
         } else {
-            // On desktop: use native Fullscreen API
-            const el = document.documentElement;
-            if (!document.fullscreenElement) {
-                if (el.requestFullscreen) el.requestFullscreen();
-                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
+            // Exit fullscreen: restore layout
+            rightPane.classList.remove('fs-hidden');
+            leftPane.style.width = '';
+            leftPane.style.height = '';
+            leftPane.style.justifyContent = '';
+            leftPane.style.alignItems = '';
+            appContainer.style.flexDirection = '';
+            btn.innerText = '⛶ Fullscreen';
         }
     }
 
     function closeMobileFs() {
-        const overlay = document.getElementById('mobile-fs-overlay');
-        const gridContainer = document.getElementById('grid-container');
-        const leftPane = document.querySelector('.left-pane');
-        // Move the real grid back to its original spot
-        leftPane.appendChild(gridContainer);
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        // Alias kept for safety
+        toggleFullScreen();
     }
 </script>
 </body>

@@ -83,7 +83,7 @@
                 border-left: none;
                 border-bottom: 2px solid #333;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-                padding: 10px 15px;
+                padding: 30px 15px 10px 15px; /* Increased top padding to avoid keyboard bars */
                 overflow-y: auto;
                 box-sizing: border-box;
                 flex-shrink: 0;
@@ -616,6 +616,10 @@
                     input.type = 'text';
                     input.maxLength = 1;
                     input.id = `input-${x}-${y}`;
+                    input.setAttribute('autocomplete', 'off');
+                    input.setAttribute('autocorrect', 'off');
+                    input.setAttribute('autocapitalize', 'off');
+                    input.setAttribute('spellcheck', 'false');
                     
                     input.addEventListener('focus', () => handleCellFocus(x, y, cellMap[key].words));
                     input.addEventListener('input', (e) => handleCellInput(e, x, y));

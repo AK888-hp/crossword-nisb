@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>CROSSCURRENT</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -73,27 +73,27 @@
         /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 768px) {
             body {
-                overflow: hidden;
+                overflow: auto; /* Allows zoom and scroll on body level */
                 height: 100vh;
+                touch-action: pan-x pan-y pinch-zoom; /* Enable native pan and zoom */
             }
             .app-container {
-                flex-direction: column;
+                display: block; /* Switch to block to avoid flexbox clipping on scroll */
                 height: 100vh;
-                overflow: hidden;
+                overflow: auto;
             }
             .left-pane {
+                display: block !important; /* Critical for 2D scroll and zoom bounds */
                 width: 100%;
-                flex: 1;
-                height: 100vh;
+                height: 100%;
                 overflow: auto;
                 -webkit-overflow-scrolling: touch;
                 padding: 10px;
-                justify-content: flex-start;
-                align-items: flex-start;
                 box-sizing: border-box;
             }
             .crossword-wrapper {
-                width: max-content !important; /* Forces horizontal scroll on mobile */
+                width: max-content !important; /* Forces horizontal scroll */
+                height: max-content !important; /* Forces vertical scroll */
                 margin: 0 auto;
             }
             /* Hide the right panel entirely on mobile */
@@ -211,24 +211,38 @@
         :fullscreen body,
         :-webkit-full-screen body,
         :-moz-full-screen body {
-            overflow: auto;
+            overflow: auto !important; /* Enable native scrolling */
+            width: 100vw;
             height: 100vh;
+            margin: 0;
+            padding: 0;
+            touch-action: pan-x pan-y pinch-zoom;
         }
         :fullscreen .app-container,
         :-webkit-full-screen .app-container,
         :-moz-full-screen .app-container {
-            flex-direction: column;
+            display: block !important; /* Removes flex clipping constraints */
+            width: 100vw;
             height: 100vh;
+            overflow: auto !important;
         }
         :fullscreen .left-pane,
         :-webkit-full-screen .left-pane,
         :-moz-full-screen .left-pane {
+            display: block !important; /* Forces 2D bounds for scroll and zoom */
             width: 100%;
-            height: 100vh;
-            overflow: auto;
+            height: 100%;
+            overflow: auto !important;
             -webkit-overflow-scrolling: touch;
-            justify-content: flex-start;
-            align-items: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        :fullscreen .crossword-wrapper,
+        :-webkit-full-screen .crossword-wrapper,
+        :-moz-full-screen .crossword-wrapper {
+            width: max-content !important;
+            height: max-content !important;
+            margin: 0 auto;
         }
         :fullscreen .right-pane,
         :-webkit-full-screen .right-pane,

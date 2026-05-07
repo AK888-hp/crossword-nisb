@@ -105,6 +105,9 @@ st.markdown("""
         .logo-center img { height: 75px; }
         .logo-right { top: 8px; right: 10px; }
         .logo-right img { height: 40px; }
+
+        /* On mobile, reduce spacing above game content */
+        .game-mobile-spacer { display: none !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -137,15 +140,33 @@ def login_page():
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<h1 style='color: #D4FF00 !important; text-shadow: 0 0 10px rgba(212, 255, 0, 0.3); text-align: center;'>CROSSCURRENT</h1>", unsafe_allow_html=True)
     
-    tab1, tab2 = st.tabs(["Player Login", "Admin Login"])
+    # Check if admin access via query param: ?admin=true
+    query_params = st.query_params
+    is_admin_mode = query_params.get("admin", "") == "true"
     
-    with tab1:
+    if is_admin_mode:
+        st.subheader("Admin Login")
+        admin_username = st.text_input("Admin Username")
+        admin_password = st.text_input("Admin Password", type="password")
+        if st.button("Login as Admin"):
+            if admin_username and admin_password:
+                try:
+                    res = requests.post(f"{API_URL}/admin/login", json={"username": admin_username, "password": admin_password})
+                    if res.status_code == 200:
+                        st.session_state.user = admin_username
+                        st.session_state.is_admin = True
+                        st.rerun()
+                    else:
+                        st.error("Invalid credentials.")
+                except Exception as e:
+                    st.error(f"Backend not available. Error: {e}")
+    else:
         st.subheader("Join the Competition")
         username = st.text_input("Enter your username to play:")
         event_password = st.text_input("Enter event password:", type="password")
         if st.button("Start Playing"):
             if username and event_password:
-                if event_password != "ILLUME_CROSSCURRENT_123":
+                if event_password != "crosscurrent_2026":
                     st.error("Invalid Event Password.")
                 else:
                     try:
@@ -161,36 +182,19 @@ def login_page():
                         st.error(f"Backend not available. Error: {e}")
             else:
                 st.warning("Please enter both username and event password.")
-                
-    with tab2:
-        st.subheader("Admin Login")
-        admin_username = st.text_input("Admin Username")
-        admin_password = st.text_input("Admin Password", type="password")
-        if st.button("Login as Admin"):
-            if admin_username and admin_password:
-                try:
-                    res = requests.post(f"{API_URL}/admin/login", json={"username": admin_username, "password": admin_password})
-                    if res.status_code == 200:
-                        data = res.json()
-                        st.session_state.user = admin_username
-                        st.session_state.is_admin = True
-                        st.rerun()
-                    else:
-                        st.error("Invalid credentials.")
-                except Exception as e:
-                    st.error(f"Backend not available. Error: {e}")
 
 def game_page():
     render_logos()
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='color: #D4FF00 !important; text-shadow: 0 0 10px rgba(212, 255, 0, 0.3); text-align: center;'>CROSSCURRENT: Welcome, {st.session_state.user}!</h1>", unsafe_allow_html=True)
-    if st.button("Logout"):
-        st.session_state.user = None
-        st.session_state.is_admin = False
-        st.rerun()
-        
-    st.markdown("### Crossword Puzzle")
-    st.write("Click on a box to see the clue. Correct answers will automatically lock in.")
+    st.markdown('<div class="game-mobile-spacer"><br><br></div>', unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([4, 2, 1])
+    with col1:
+        st.markdown(f"<p style='color: #D4FF00; font-family: Orbitron, sans-serif; font-size: 0.9em; letter-spacing: 2px; margin:0;'>PLAYER: {st.session_state.user}</p>", unsafe_allow_html=True)
+    with col3:
+        if st.button("Logout"):
+            st.session_state.user = None
+            st.session_state.is_admin = False
+            st.rerun()
 
     # Read the HTML file for the crossword component
     html_path = os.path.join(os.path.dirname(__file__), "static", "crossword.html")
@@ -205,9 +209,11 @@ def game_page():
     import base64
     encoded = base64.b64encode(html_content.encode('utf-8')).decode('utf-8')
     st.markdown(
-        f'<iframe src="data:text/html;base64,{encoded}" width="100%" height="1000" '
+        f'<iframe id="crossword-frame" src="data:text/html;base64,{encoded}" '
+        f'width="100%" height="900" '
         f'allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" '
-        f'frameborder="0" style="border:none;"></iframe>',
+        f'frameborder="0" style="border:none;"></iframe>'
+        f'<style>@media (max-width: 768px) {{ #crossword-frame {{ height: 85vh !important; }} }}</style>',
         unsafe_allow_html=True
     )
 

@@ -879,25 +879,39 @@
     }
 
     function handleCellInput(e, x, y) {
-        const val = e.target.value;
+        let val = e.target.value;
+        
+        // Safety lock for mobile keyboards: prevent multi-char dumps from swipe/autocomplete
+        if (val.length > 1) {
+            val = val.substring(val.length - 1); // Extract the very last typed character
+            e.target.value = val;
+        }
+
         if(val && currentWordInfo) {
             const wordToValidate = currentWordInfo; 
-            let nx = x;
-            let ny = y;
-            if(currentWordInfo.direction === 'across') nx++;
-            else ny++;
             
+            // Calculate exactly where the word ends
             const endX = currentWordInfo.direction === 'across' ? currentWordInfo.x + currentWordInfo.length - 1 : currentWordInfo.x;
             const endY = currentWordInfo.direction === 'down' ? currentWordInfo.y + currentWordInfo.length - 1 : currentWordInfo.y;
             
-            if ((currentWordInfo.direction === 'across' && nx <= endX) || 
-                (currentWordInfo.direction === 'down' && ny <= endY)) {
+            // Check if the current box being typed in is the LAST box of the word
+            const isAtEnd = (currentWordInfo.direction === 'across' && x === endX) || 
+                            (currentWordInfo.direction === 'down' && y === endY);
+            
+            if (!isAtEnd) {
+                // If not at the end, move the cursor forward
+                let nx = x;
+                let ny = y;
+                if(currentWordInfo.direction === 'across') nx++;
+                else ny++;
+                
                 const nextInput = document.getElementById(`input-${nx}-${ny}`);
                 if(nextInput && !nextInput.disabled) {
                     nextInput.focus();
                 }
-            }
-            
+            } 
+            // NOTE: If isAtEnd is true, the cursor explicitly does NOT move forward.
+
             autoValidate(wordToValidate); 
         }
     }
@@ -926,14 +940,24 @@
         if(wordsCompleted.has(wordInfo.id)) return;
         
         let guessedWord = "";
+        let isComplete = true; // Strict validation flag
+        
         for(let i=0; i<wordInfo.length; i++) {
             const cx = wordInfo.direction === 'across' ? wordInfo.x + i : wordInfo.x;
             const cy = wordInfo.direction === 'down' ? wordInfo.y + i : wordInfo.y;
             const input = document.getElementById(`input-${cx}-${cy}`);
-            guessedWord += input ? input.value : "";
+            
+            // Ensure EVERY box has exactly 1 valid character before allowing a backend check
+            if (input && input.value && input.value.trim().length > 0) {
+                guessedWord += input.value.trim().charAt(0);
+            } else {
+                isComplete = false; 
+                break; // Missing letter, abort validation
+            }
         }
         
-        if(guessedWord.length !== wordInfo.length) {
+        // Stop execution if there are empty boxes, or if somehow the combined length doesn't perfectly match
+        if(!isComplete || guessedWord.length !== wordInfo.length) {
             return; 
         }
 

@@ -157,6 +157,8 @@
                 max-height: 40vh;
                 overflow-y: auto;
                 transform: translate3d(0, 0, 0); 
+                cursor: move; /* Indicates the whole box is movable */
+                touch-action: none; /* Prevents scroll interference when dragging anywhere */
             }
             .mobile-clue-popup.visible {
                 display: block;
@@ -168,8 +170,6 @@
                 margin-bottom: 5px;
                 padding-bottom: 5px;
                 border-bottom: 1px solid #333;
-                cursor: move;
-                touch-action: none;
             }
             .mobile-clue-popup .mcp-meta {
                 font-family: 'Orbitron', sans-serif;
@@ -626,9 +626,8 @@
         }
     }
 
-    // Drag Logic for Mobile Clue Popup
+    // Drag Logic for Mobile Clue Popup (Applied to the whole popup)
     const mcp = document.getElementById('mobile-clue-popup');
-    const mcpHeader = document.getElementById('mcp-header');
 
     let isDragging = false;
     let currentX;
@@ -638,15 +637,18 @@
     let xOffset = 0;
     let yOffset = 0;
 
-    mcpHeader.addEventListener("touchstart", dragStart, {passive: false});
+    mcp.addEventListener("touchstart", dragStart, {passive: false});
     document.addEventListener("touchend", dragEnd, {passive: false});
     document.addEventListener("touchmove", drag, {passive: false});
 
-    mcpHeader.addEventListener("mousedown", dragStart);
+    mcp.addEventListener("mousedown", dragStart);
     document.addEventListener("mouseup", dragEnd);
     document.addEventListener("mousemove", drag);
 
     function dragStart(e) {
+        // Prevent dragging if the user is explicitly trying to close the popup
+        if (e.target.classList.contains('mcp-close')) return;
+
         if (e.type === "touchstart") {
             initialX = e.touches[0].clientX - xOffset;
             initialY = e.touches[0].clientY - yOffset;
@@ -654,7 +656,9 @@
             initialX = e.clientX - xOffset;
             initialY = e.clientY - yOffset;
         }
-        if (e.target === mcpHeader || mcpHeader.contains(e.target)) {
+        
+        // Trigger drag if they touch anywhere on the popup
+        if (e.target === mcp || mcp.contains(e.target)) {
             isDragging = true;
         }
     }
@@ -667,7 +671,7 @@
 
     function drag(e) {
         if (isDragging) {
-            e.preventDefault();
+            e.preventDefault(); // Prevents the screen from scrolling while dragging the popup
             if (e.type === "touchmove") {
                 currentX = e.touches[0].clientX - initialX;
                 currentY = e.touches[0].clientY - initialY;

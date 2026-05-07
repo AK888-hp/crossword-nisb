@@ -73,17 +73,17 @@
         /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 768px) {
             body {
-                overflow: auto; /* Allows zoom and scroll on body level */
+                overflow: auto; 
                 height: 100vh;
-                touch-action: pan-x pan-y pinch-zoom; /* Enable native pan and zoom */
+                touch-action: pan-x pan-y pinch-zoom;
             }
             .app-container {
-                display: block; /* Switch to block to avoid flexbox clipping on scroll */
+                display: block; 
                 height: 100vh;
                 overflow: auto;
             }
             .left-pane {
-                display: block !important; /* Critical for 2D scroll and zoom bounds */
+                display: block !important; 
                 width: 100%;
                 height: 100%;
                 overflow: auto;
@@ -92,11 +92,10 @@
                 box-sizing: border-box;
             }
             .crossword-wrapper {
-                width: max-content !important; /* Forces horizontal scroll */
-                height: max-content !important; /* Forces vertical scroll */
-                margin: 0 auto;
+                width: max-content !important; 
+                height: max-content !important; 
+                margin: 0;
             }
-            /* Hide the right panel entirely on mobile */
             .right-pane {
                 display: none !important;
             }
@@ -169,11 +168,11 @@
                 padding-bottom: 5px;
                 border-bottom: 1px solid #333;
                 cursor: move;
-                touch-action: none; /* Prevents scroll interference when dragging */
+                touch-action: none;
             }
             .mobile-clue-popup .mcp-meta {
                 font-family: 'Orbitron', sans-serif;
-                font-size: 0.6em; /* Reduced size */
+                font-size: 0.6em;
                 letter-spacing: 1px;
                 color: var(--accent-color);
                 text-transform: uppercase;
@@ -182,7 +181,7 @@
                 background: transparent;
                 border: none;
                 color: #aaa;
-                font-size: 1.2em; /* Smaller X button */
+                font-size: 1.2em;
                 padding: 0 5px;
                 cursor: pointer;
             }
@@ -191,7 +190,7 @@
             }
             .mobile-clue-popup .mcp-text {
                 font-family: 'Rajdhani', sans-serif;
-                font-size: 0.9em; /* Reduced size */
+                font-size: 0.9em;
                 font-weight: 500;
                 color: #fff;
                 line-height: 1.2;
@@ -199,7 +198,7 @@
             }
             .mobile-clue-popup .mcp-timer {
                 font-family: 'Orbitron', sans-serif;
-                font-size: 0.6em; /* Reduced size */
+                font-size: 0.6em;
                 color: var(--accent-color);
                 letter-spacing: 1px;
                 text-align: right;
@@ -208,10 +207,13 @@
         }
 
         /* ===== FULLSCREEN MODE STYLES ===== */
+        :fullscreen, :-webkit-full-screen, :-moz-full-screen {
+            background-color: var(--bg-color); /* Ensure full black background */
+        }
         :fullscreen body,
         :-webkit-full-screen body,
         :-moz-full-screen body {
-            overflow: auto !important; /* Enable native scrolling */
+            overflow: auto !important;
             width: 100vw;
             height: 100vh;
             margin: 0;
@@ -221,20 +223,22 @@
         :fullscreen .app-container,
         :-webkit-full-screen .app-container,
         :-moz-full-screen .app-container {
-            display: block !important; /* Removes flex clipping constraints */
+            display: block !important; 
             width: 100vw;
             height: 100vh;
             overflow: auto !important;
+            margin: 0;
+            padding: 0;
         }
         :fullscreen .left-pane,
         :-webkit-full-screen .left-pane,
         :-moz-full-screen .left-pane {
-            display: block !important; /* Forces 2D bounds for scroll and zoom */
+            display: block !important; 
             width: 100%;
             height: 100%;
             overflow: auto !important;
             -webkit-overflow-scrolling: touch;
-            padding: 20px;
+            padding: 0 !important; /* Remove padding entirely to maximize screen space */
             box-sizing: border-box;
         }
         :fullscreen .crossword-wrapper,
@@ -242,7 +246,9 @@
         :-moz-full-screen .crossword-wrapper {
             width: max-content !important;
             height: max-content !important;
-            margin: 0 auto;
+            margin: 0 !important; 
+            border: none !important; /* Remove border to free up pixels */
+            padding: 5px !important;
         }
         :fullscreen .right-pane,
         :-webkit-full-screen .right-pane,

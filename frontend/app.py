@@ -167,7 +167,7 @@ def login_page():
         if st.button("Start Playing"):
             if username and event_password:
                 if event_password != "crosscurrent_2026":
-                    st.error("Invalid Event Password.")
+                    st.error("Invalid Password.")
                 else:
                     try:
                         res = requests.post(f"{API_URL}/login", json={"username": username})

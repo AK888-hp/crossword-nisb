@@ -94,7 +94,8 @@
             .crossword-wrapper {
                 width: max-content !important; 
                 height: max-content !important; 
-                margin: 0;
+                /* Adds top padding to center the grid, and huge bottom margin so it can scroll above the keyboard */
+                margin: 30vh auto 60vh auto !important; 
             }
             .right-pane {
                 display: none !important;
@@ -238,7 +239,7 @@
             height: 100%;
             overflow: auto !important;
             -webkit-overflow-scrolling: touch;
-            padding: 0 !important; /* Remove padding entirely to maximize screen space */
+            padding: 0 !important; 
             box-sizing: border-box;
         }
         :fullscreen .crossword-wrapper,
@@ -246,8 +247,8 @@
         :-moz-full-screen .crossword-wrapper {
             width: max-content !important;
             height: max-content !important;
-            margin: 0 !important; 
-            border: none !important; /* Remove border to free up pixels */
+            margin: 0 auto !important; 
+            border: none !important;
             padding: 5px !important;
         }
         :fullscreen .right-pane,
@@ -259,6 +260,20 @@
         :-webkit-full-screen .fullscreen-btn,
         :-moz-full-screen .fullscreen-btn {
             display: none !important;
+        }
+
+        /* Maintain Mobile Padding Overrides Even in Fullscreen */
+        @media (max-width: 768px) {
+            :fullscreen .crossword-wrapper,
+            :-webkit-full-screen .crossword-wrapper,
+            :-moz-full-screen .crossword-wrapper {
+                margin: 30vh auto 60vh auto !important; 
+            }
+            :fullscreen .left-pane,
+            :-webkit-full-screen .left-pane,
+            :-moz-full-screen .left-pane {
+                padding: 10px !important;
+            }
         }
 
         .dashboard-stats {
